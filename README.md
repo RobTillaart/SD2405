@@ -19,6 +19,10 @@ Arduino library for I2C SD2405 RTC and compatibles.
 This SD2405 library provides a minimalistic interface to read and write the date
 and time to and from the I2C SD2405 RTC device and compatibles.
 
+An unique feature of the SD2405 is a build in internal battery, which should 
+be able to keep the RTC running for 6 months or more. The datasheet mentions
+at least a 100 recharges which could be interesting for very long running projects. It is unclear how the internal battery works when temperature drops.
+
 What is different from other RTC libraries is that it directly provides fields like
 seconds, minutes etc. and not use ``` time structs``` from libraries like
 ```time.h``` or ```timelib.h```. This has its pros and cons of course.
@@ -32,8 +36,14 @@ The current version does not support any special feature other than two generic
 **readRegister()** and **writeRegister()** functions.
 These two functions allows users access to all registers and to do anything possible.
 
+The SD2405 has several functions not found on other RTC's, especially a
+correction for the clock to minimize deviations (ppm). This functionality
+is most interesting however not implemented in this library yet. 
+
 Note: This SD2405 library is a refactored version of an older experimental SD2405 library
-from 2022 which was never published. It is recently aligned with the DS3232 library.
+from 2022 which was never published. 
+The API (base RTC functions), documentation and examples is recently (0.1.1) 
+aligned with the DS3232 library.
 
 Note: The library 0.1.1 is not tested yet with hardware.
 
@@ -230,6 +240,7 @@ the boundaries are not checked.
 - test performance / footprint
 - test SRAM with a SD2405 (need hardware + time)
 - implement more functionality (need hardware + time)
+- investigate behavior internal battery at low temperature (< 0 C)
 
 #### Could
 
