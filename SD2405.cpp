@@ -2,7 +2,7 @@
 //    FILE: SD2405.cpp
 //  AUTHOR: Rob Tillaart
 // PURPOSE: Arduino library for I2C SD2405 RTC and compatibles.
-// VERSION: 0.1.1
+// VERSION: 0.1.2
 //    DATE: 2022-03-17
 //     URL: https://github.com/RobTillaart/SD2405
 
@@ -295,9 +295,30 @@ int SD2405::disableWriteRTC()
 }
 
 
+int setFOBAT(bool flag)
+{
+  const uint8_t FOBAT = 0x80;
+  uint8_t mask = readRegister(0x10);
+  uint8_t premask = mask;
+  mask &= ~FOBAT;
+  if (flag)
+  {
+    mask |= FOBAT;
+  }
+  if (mask != premask)
+  {
+    return writeRegister(0x10, mask);
+  }
+  return SD2405_OK;
+}
 
 
-
+bool getRCTF()
+{
+  const uint8_t RCTF = 0x01;
+  uint8_t mask = readRegister(0x10);
+  return (mask & RCTF) >0 ;
+}
 
 
 /////////////////////////////////////////////////////////

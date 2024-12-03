@@ -3,7 +3,7 @@
 //    FILE: SD2405.h
 //  AUTHOR: Rob Tillaart
 // PURPOSE: Arduino library for I2C SD2405 RTC and compatibles.
-// VERSION: 0.1.1
+// VERSION: 0.1.2
 //    DATE: 2022-03-17
 //     URL: https://github.com/RobTillaart/SD2405
 
@@ -12,7 +12,7 @@
 #include "Wire.h"
 
 
-#define SD2405_LIB_VERSION           (F("0.1.1"))
+#define SD2405_LIB_VERSION           (F("0.1.2"))
 
 
 //  ERROR CODES
@@ -26,6 +26,7 @@
 //  not all used yet
 #define SD2405_TIME_BASE            0x00
 #define SD2405_ALARM_BASE           0x07
+#define SD2405_ALARM_ENABLE         0x0E
 #define SD2405_CONTROL_1            0x0F
 #define SD2405_CONTROL_2            0x10
 #define SD2405_CONTROL_3            0x11
@@ -118,7 +119,7 @@ public:
   //  FREQUENCY INTERRUPT FUNCTIONS
   //
   //  par 5.3. register 0x11, FS0..FS3
-  //  bit_mask = 0..15, TODO add table in readme.md
+  //  bit_mask = 0..15
   int setFrequencyMask(uint8_t bit_mask);
 
 
@@ -157,12 +158,8 @@ public:
   int enableWriteRTC();
   int disableWriteRTC();
 
-/*
-  void setFOBAT(bool flag);
-
+  int setFOBAT(bool flag);
   bool getRCTF();
-
-*/
 
 
   ////////////////////////////////////////////////////////////////////

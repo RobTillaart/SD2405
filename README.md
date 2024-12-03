@@ -179,13 +179,69 @@ Note that **read()** will overwrite all internal registers.
 Note: you can also adjust just one field and keep the others.
 
 
-### Temperature
+### Configure interrupts
 
-Note that the temperature measurement is only refreshed every 64 (default),
-128, 256 or 512 seconds.
-The interval can be set with bits 5 and 4 of the CONTROL/STATUS register (0x0F).
+  //  source: disable = 0, 1 = alarm, 2 = frequency, 3 = timer
+  //  repeat: single = false, repeat = true until INTAF is reset
+  //  autoReset: ARST = 0 = false, ARST = 1 = true.
+- **int configureInterrupt(uint8_t source, bool repeat, bool autoReset)**
 
-- **float getTemperature()** return temperature in 0.25°C steps.
+  //  par 5.3, register 0x0F, INTAF, INTDF reset both manually.
+- **int resetInterruptFlags()**
+
+
+### Alarm interrupts
+
+Setters
+
+- **int setAlarmSecond(uint8_t value)**
+- **int setAlarmMinute(uint8_t value)**
+- **int setAlarmHour(uint8_t value)**
+- **int setAlarmWeek(uint8_t value)**  TODO format == bit mask.
+- **int setAlarmDay(uint8_t value)**
+- **int setAlarmMonth(uint8_t value)**
+- **int setAlarmYear(uint8_t value)**
+
+Getters
+
+- **int getAlarmSecond()**
+- **int getAlarmMinute()**
+- **int getAlarmHour()**
+- **int getAlarmWeek()**
+- **int getAlarmDay()**
+- **int getAlarmMonth()**
+- **int getAlarmYear()**
+
+  //  par 5.3, register 0x0E
+  //  bit_mask = { 0 Y M W D H Min S }
+- **int setAlarmInterrupt(uint8_t bit_mask)**
+
+
+### Frequency interrupts
+
+  //  par 5.3. register 0x11, FS0..FS3
+  //  bit_mask = 0..15, TODO add table in readme.md
+- **int setFrequencyMask(uint8_t bit_mask)**
+
+
+### CountDown interrupts
+
+  //  bit_mask = 0..3, TODO add table in readme.md
+  //  TODO examples
+  //  1 - 255 minutes, 1 - 255 seconds,
+  //  1/64 .. 255/64 seconds, 1/4096 - 255/4096)  => 1/100 ~~ 41/4096
+  //  e.g 5 minute repeating alarm?
+- **int setCountDownMask(uint8_t bit_mask)**
+  //  par 5.3. register 0x13
+- **int setCountDown(uint8_t value)**
+
+
+### Time Trimming
+
+  //  read the data sheet (twice)
+  //  oscillator = actual frequency (ist)
+  //  target = target frequency (soll)
+- **int adjustClockFrequency(int32_t oscillator, int32_t target)**
 
 
 ### Low level: Read/WriteRegister
@@ -198,25 +254,18 @@ Use with care.
 - **int writeRegister(uint8_t reg, uint8_t value)**
 
 
-### Debug
-
-In case of an I2C error one can get the last return value
-of ```wire.EndTransmission()``` to get an indication of the problem.
-
-- **int lastRv()** values depend on platform used.
-
 
 ## SD2405 SRAM
 
-**Experimental** SRAM support, needs to be tested / verified.
+SRAM support, needs to be tested / verified.
 Feedback welcome.
 
-SRAM is SD2405 specific, and it has 236 bytes.
-The following functions use index 0..235.
+SRAM has 12 bytes.
+The following functions use index 0..11.
 The user should guard the index especially for the 16 and 32 bit versions as
 the boundaries are not checked.
 
-236 bytes can be used e.g. to hold 78 hms timestamps.
+12 bytes can be used e.g. to hold 3 hms timestamps.
 
 - **int SRAMwrite8(uint8_t index, uint8_t value)**
 - **int SRAMwrite16(uint8_t index, uint16_t value)**
@@ -240,7 +289,7 @@ the boundaries are not checked.
 - test performance / footprint
 - test SRAM with a SD2405 (need hardware + time)
 - implement more functionality (need hardware + time)
-- investigate behavior internal battery at low temperature (< 0 C)
+- investigate behaviour internal battery at low temperature ( < 0 C)
 
 #### Could
 
@@ -248,6 +297,7 @@ the boundaries are not checked.
   - only after confirmed with hardware.
 - register names instead of numbers?
 - add error handling
+  - last value rv?
 
 
 #### Wont
