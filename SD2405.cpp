@@ -295,7 +295,7 @@ int SD2405::disableWriteRTC()
 }
 
 
-int setFOBAT(bool flag)
+int SD2405::setFOBAT(bool flag)
 {
   const uint8_t FOBAT = 0x80;
   uint8_t mask = readRegister(0x10);
@@ -313,7 +313,7 @@ int setFOBAT(bool flag)
 }
 
 
-bool getRCTF()
+bool SD2405::getRCTF()
 {
   const uint8_t RCTF = 0x01;
   uint8_t mask = readRegister(0x10);
