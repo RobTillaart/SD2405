@@ -24,12 +24,13 @@
 
 //  REGISTERS SD2405 (maybe also for SD2405)
 //  not all used yet
-#define SD2405_SECONDS              0x00
-#define SD2405_ALARM1               0x07
-#define SD2405_ALARM2               0x0B
-#define SD2405_CONTROL              0x0E
-#define SD2405_AGING_OFFSET         0x10
-#define SD2405_TEMPERATURE          0x11
+#define SD2405_TIME_BASE            0x00
+#define SD2405_ALARM_BASE           0x07
+#define SD2405_CONTROL_1            0x0F
+#define SD2405_CONTROL_2            0x10
+#define SD2405_CONTROL_3            0x11
+#define SD2405_TIME_TRIMMING        0x12
+#define SD2405_COUNTDOWN            0x13
 #define SD2405_SRAM_BASE            0x14
 
 
@@ -46,33 +47,127 @@ public:
   uint8_t  getAddress();
 
 
-  //  BASE RTC
+  ////////////////////////////////////////////////////////////////////
+  //
+  // BASE RTC
+  //
   int      read();
   int      write();
   uint32_t lastRead();
 
-
   //  Getters
-  uint8_t  seconds();
-  uint8_t  minutes();
-  uint8_t  hours();
-  uint8_t  weekDay();
-  uint8_t  day();
-  uint8_t  month();
-  uint8_t  year();
-
+  uint8_t seconds();
+  uint8_t minutes();
+  uint8_t hours();
+  uint8_t weekDay();
+  uint8_t day();
+  uint8_t month();
+  uint8_t year();
 
   //  Setters
-  void     setSeconds(uint8_t value);
-  void     setMinutes(uint8_t value);
-  void     setHours(uint8_t value);
-  void     setWeekDay(uint8_t value);
-  void     setDay(uint8_t value);
-  void     setMonth(uint8_t value);
-  void     setYear(uint8_t value);
+  void setSeconds(uint8_t value);
+  void setMinutes(uint8_t value);
+  void setHours(uint8_t value);
+  void setWeekDay(uint8_t value);
+  void setDay(uint8_t value);
+  void setMonth(uint8_t value);
+  void setYear(uint8_t value);
 
 
-  //  EXPERIMENTAL SRAM SUPPORT
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  CONFIGURE INTERRUPT FUNCTIONS
+  //
+  //  par 5.3, register 0x10, INTS0, INTS1, INTDE, INTAE, INTFE, IM
+  //  source: disable = 0, 1 = alarm, 2 = frequency, 3 = timer
+  //  repeat: single = false, repeat = true until INTAF is reset
+  //  autoReset: ARST = 0 = false, ARST = 1 = true.
+  int configureInterrupt(uint8_t source, bool repeat, bool autoReset);
+
+  //  par 5.3, register 0x0F, INTAF, INTDF reset both manually.
+  int resetInterruptFlags() { return readRegister(0x0F); };
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  ALARM INTERRUPT FUNCTIONS
+  //
+  //  par 5.3, register 0x07 - 0x0D
+  int setAlarmSecond(uint8_t value) { return writeRegister(0x07, value); };
+  int setAlarmMinute(uint8_t value) { return writeRegister(0x08, value); };
+  int setAlarmHour(uint8_t value)   { return writeRegister(0x09, value); };
+  int setAlarmWeek(uint8_t value)   { return writeRegister(0x0A, value); };  //  format == bit mask.
+  int setAlarmDay(uint8_t value)    { return writeRegister(0x0B, value); };
+  int setAlarmMonth(uint8_t value)  { return writeRegister(0x0C, value); };
+  int setAlarmYear(uint8_t value)   { return writeRegister(0x0D, value); };
+  int getAlarmSecond()              { return readRegister(0x07); };
+  int getAlarmMinute()              { return readRegister(0x08); };
+  int getAlarmHour()                { return readRegister(0x09); };
+  int getAlarmWeek()                { return readRegister(0x0A); };
+  int getAlarmDay()                 { return readRegister(0x0B); };
+  int getAlarmMonth()               { return readRegister(0x0C); };
+  int getAlarmYear()                { return readRegister(0x0D); };
+
+  //  par 5.3, register 0x0E
+  //  bit_mask = { 0 Y M W D H Min S }
+  int setAlarmInterrupt(uint8_t bit_mask) { return writeRegister(0x0E, bit_mask); };
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  FREQUENCY INTERRUPT FUNCTIONS
+  //
+  //  par 5.3. register 0x11, FS0..FS3
+  //  bit_mask = 0..15, TODO add table in readme.md
+  int setFrequencyMask(uint8_t bit_mask);
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  COUNTDOWN INTERRUPT FUNCTIONS
+  //
+  //  par 5.3. register 0x11, FS0..FS3
+  //  bit_mask = 0..3, TODO add table in readme.md
+  //  TODO examples
+  //  1 - 255 minutes, 1 - 255 seconds,
+  //  1/64 .. 255/64 seconds, 1/4096 - 255/4096)  => 1/100 ~~ 41/4096
+  //  e.g 5 minute repeating alarm?
+  int setCountDownMask(uint8_t bit_mask);
+  //  par 5.3. register 0x13
+  int setCountDown(uint8_t value) { return writeRegister(0x13, value); };
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  TIME TRIMMING FUNCTIONS
+  //
+  //  par 5.4. register 0x12, 0..127
+  //  read the data sheet (twice)
+  //  oscillator = actual frequency (ist)
+  //  target = target frequency (soll)
+  int adjustClockFrequency(int32_t oscillator, int32_t target);
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  OTHER FUNCTIONS
+  //
+  //  par 5.5. register
+  //  read the data sheet (twice)
+  int enableWriteRTC();
+  int disableWriteRTC();
+
+/*
+  void setFOBAT(bool flag);
+
+  bool getRCTF();
+
+*/
+
+
+  ////////////////////////////////////////////////////////////////////
+  //
+  //  SRAM SUPPORT
   //
   //  SRAM 12 bytes, register 0x14-0x1F
   //  index = 0..11 == 0x00..0x1B

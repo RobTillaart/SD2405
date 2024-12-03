@@ -244,6 +244,12 @@ the boundaries are not checked.
 
 #### Could
 
+- cache control registers to improve performance.
+  - only after confirmed with hardware.
+- register names instead of numbers?
+- add error handling
+
+
 #### Wont
 
 
