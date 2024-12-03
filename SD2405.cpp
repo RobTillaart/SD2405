@@ -195,7 +195,7 @@ int SD2405::configureInterrupt(uint8_t source, bool repeat, bool autoReset)
 //  FREQUENCY INTERRUPT FUNCTIONS
 //
 //  par 5.3. register 0x11, FS0..FS3
-//  bit_mask = 0..15, TODO add table in readme.md
+//  bit_mask = 0..15
 int SD2405::setFrequencyMask(uint8_t bit_mask)
 {
   const uint8_t FSBITS = 0x0F;
@@ -216,11 +216,11 @@ int SD2405::setFrequencyMask(uint8_t bit_mask)
 //  COUNTDOWN INTERRUPT FUNCTIONS
 //
 //  par 5.3. register 0x11, FS0..FS3
-//  bit_mask = 0..3, TODO add table in readme.md
-//  TODO examples
-//  1 - 255 minutes, 1 - 255 seconds,
-//  1/64 .. 255/64 seconds, 1/4096 - 255/4096)  => 1/100 ~~ 41/4096
-//  e.g 5 minute repeating alarm?
+//  bit_mask =>  RANGE
+//      0        1/4096 - 255/4096  => 1/100 ~~ 41/4096
+//      1        1 - 255 seconds
+//      2        1/64 .. 255/64 seconds
+//      3        1 - 255 minutes
 int SD2405::setCountDownMask(uint8_t bit_mask)
 {
   const uint8_t TDSBITS = 0x30;
@@ -417,6 +417,7 @@ int SD2405::writeRegister(uint8_t reg, uint8_t value)
 //
 //  PROTECTED
 //
+//  see fast_math library for optimisation of dec2bcd and bcd2dec
 uint8_t SD2405::dec2bcd(uint8_t value)
 {
   return value + 6 * (value / 10);

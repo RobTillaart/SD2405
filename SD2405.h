@@ -94,20 +94,21 @@ public:
   //  ALARM INTERRUPT FUNCTIONS
   //
   //  par 5.3, register 0x07 - 0x0D
-  int setAlarmSecond(uint8_t value) { return writeRegister(0x07, value); };
-  int setAlarmMinute(uint8_t value) { return writeRegister(0x08, value); };
-  int setAlarmHour(uint8_t value)   { return writeRegister(0x09, value); };
-  int setAlarmWeek(uint8_t value)   { return writeRegister(0x0A, value); };  //  format == bit mask.
-  int setAlarmDay(uint8_t value)    { return writeRegister(0x0B, value); };
-  int setAlarmMonth(uint8_t value)  { return writeRegister(0x0C, value); };
-  int setAlarmYear(uint8_t value)   { return writeRegister(0x0D, value); };
-  int getAlarmSecond()              { return readRegister(0x07); };
-  int getAlarmMinute()              { return readRegister(0x08); };
-  int getAlarmHour()                { return readRegister(0x09); };
-  int getAlarmWeek()                { return readRegister(0x0A); };
-  int getAlarmDay()                 { return readRegister(0x0B); };
-  int getAlarmMonth()               { return readRegister(0x0C); };
-  int getAlarmYear()                { return readRegister(0x0D); };
+  //  not all in BCD format.
+  int setAlarmSecond(uint8_t value) { return writeRegister(0x07, dec2bcd(value)); };
+  int setAlarmMinute(uint8_t value) { return writeRegister(0x08, dec2bcd(value)); };
+  int setAlarmHour(uint8_t value)   { return writeRegister(0x09, dec2bcd(value)); };
+  int setAlarmWeek(uint8_t value)   { return writeRegister(0x0A,         value); };  //  format == bit mask.
+  int setAlarmDay(uint8_t value)    { return writeRegister(0x0B, dec2bcd(value)); };
+  int setAlarmMonth(uint8_t value)  { return writeRegister(0x0C, dec2bcd(value)); };
+  int setAlarmYear(uint8_t value)   { return writeRegister(0x0D,         value); };
+  int getAlarmSecond()              { return bcd2dec(readRegister(0x07)); };
+  int getAlarmMinute()              { return bcd2dec(readRegister(0x08)); };
+  int getAlarmHour()                { return bcd2dec(readRegister(0x09)); };
+  int getAlarmWeek()                { return         readRegister(0x0A); };
+  int getAlarmDay()                 { return bcd2dec(readRegister(0x0B)); };
+  int getAlarmMonth()               { return bcd2dec(readRegister(0x0C)); };
+  int getAlarmYear()                { return         readRegister(0x0D); };
 
   //  par 5.3, register 0x0E
   //  bit_mask = { 0 Y M W D H Min S }
@@ -128,11 +129,11 @@ public:
   //  COUNTDOWN INTERRUPT FUNCTIONS
   //
   //  par 5.3. register 0x11, FS0..FS3
-  //  bit_mask = 0..3, TODO add table in readme.md
-  //  TODO examples
-  //  1 - 255 minutes, 1 - 255 seconds,
-  //  1/64 .. 255/64 seconds, 1/4096 - 255/4096)  => 1/100 ~~ 41/4096
-  //  e.g 5 minute repeating alarm?
+  //  bit_mask =>  RANGE
+  //      0        1/4096 - 255/4096  => 1/100 ~~ 41/4096
+  //      1        1 - 255 seconds
+  //      2        1/64 .. 255/64 seconds
+  //      3        1 - 255 minutes
   int setCountDownMask(uint8_t bit_mask);
   //  par 5.3. register 0x13
   int setCountDown(uint8_t value) { return writeRegister(0x13, value); };
@@ -155,8 +156,8 @@ public:
   //
   //  par 5.5. register
   //  read the data sheet (twice)
-  int enableWriteRTC();
-  int disableWriteRTC();
+  int enableWriteRTC();   //  idem
+  int disableWriteRTC();  //  idem
 
   int setFOBAT(bool flag);
   bool getRCTF();
@@ -170,7 +171,6 @@ public:
   //  index = 0..11 == 0x00..0x1B
   //  12 bytes = 3 x uint32_t (e.g. time stamps)
   //  note: no boundary check
-  //  TODO: optimize read/write multiple bytes at once.
   int      SRAMwrite8(uint8_t index, uint8_t value);
   int      SRAMwrite16(uint8_t index, uint16_t value);
   int      SRAMwrite32(uint8_t index, uint32_t value);
