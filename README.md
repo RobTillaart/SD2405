@@ -16,35 +16,35 @@ Arduino library for I2C SD2405 RTC and compatibles.
 
 ## Description
 
-This SD2405 library provides a minimalistic interface to read and write the date
+This SD2405 library provides a interface to read and write the date
 and time to and from the I2C SD2405 RTC device and compatibles.
+Furthermore one can set alarms in many formats.
 
-An unique feature of the SD2405 is a build in (internal) battery, which should 
+An unique feature of the SD2405 is the **internal battery**, which should 
 be able to keep the RTC running for 6 months or more. The datasheet mentions
 at least a 100 recharges which could be interesting for very long running projects. 
-It is unclear how the internal battery works when temperature drops.
+It is unclear how well the internal battery works when temperature drops.
 
 What is different from other RTC libraries is that it directly provides fields like
 seconds, minutes etc. and not use ``` time structs``` from libraries like
 ```time.h``` or ```timelib.h```. This has its pros and cons of course.
-Goal is to improve the ease of use for those who just need the date and time elements
-and not use the alarms etc.
+Goal is to improve the ease of use for those who just need the date and time 
+elements.
 
 The library only supports the 24 hour per day model to minimize footprint.
-Subtracting 12 hours is not too difficult if one wants an **AM/PM** layout.
+Subtracting 12 hours is not difficult if one needs an **AM/PM** layout.
 
 The library supports two generic **readRegister()** and **writeRegister()** functions.
 These two functions allows users access to all registers and to do anything possible.
 
 The SD2405 has several functions not found on other RTC's, especially a
 correction for the clock to minimize deviations (ppm). 
-Check out **int adjustClockFrequency(int32_t oscillator, int32_t target)**
-This is a real unique feature IMHO.
+Check out **int adjustClockFrequency(int32_t oscillator, int32_t target)** below.
 
-Note: This SD2405 library is a refactored version of an older experimental SD2405 library
-from 2022 which was never published. 
+Note: This SD2405 library is a refactored version of an older experimental 
+SD2405 library from 2022 which was never published. 
 The API (base RTC functions), documentation and examples is recently (0.1.1) 
-aligned with the DS3232 library.
+aligned with my DS3232 library.
 
 Note: The current library is not tested yet with hardware.
 
@@ -91,21 +91,21 @@ Timing of UNO with SD2405 of **read()** in microseconds.
 |   UNO    |  100000  |        |
 |   UNO    |  200000  |        |
 |   UNO    |  300000  |        |
-|   UNO    |  400000  |        |  max official supported
+|   UNO    |  400000  |        |  max official supported ??
 |   UNO    |  500000  |        |
 |   UNO    |  600000  |        |
 |   UNO    |  700000  |        |
 |   UNO    |  800000  |        |
 
 Note that the performance can be increased a lot by keeping track
-of the lastRead(). See example **SD2405_demo_read_minute.ino**
-An indication averaged around 44 us per update on UNO 
-(measured on a DS3232 which is quite compatible)
+of the **lastRead()**. See example **SD2405_demo_read_minute.ino**
+An indication averaged around 44 us per update on an Arduino UNO.
+(measured on a DS3232 which is quite compatible).
 
 
 ### Address
 
-The SD2405 has a fixed address of 0x32, see datasheet
+The SD2405 has a fixed address of **0x32** or 50 decimal, see datasheet.
 
 ### I2C multiplexing
 
@@ -140,27 +140,28 @@ too if they are behind the multiplexer.
 - **SD2405(TwoWire \*wire = &Wire)** Constructor and optional set the I2C bus, e.g. to Wire1.
 - **int begin()** initializes internals.
 Returns error status.
-- **bool isConnected()** checks if address (0x68) can be seen on the I2C bus.
-- **uint8_t getAddress()** returns address (0x68) set in constructor.
+- **bool isConnected()** checks if address (0x32) can be seen on the I2C bus.
+- **uint8_t getAddress()** returns fixed address (0x32).
 
 ### Base RTC
 
-- **int read()** read the current time fields from the DS2405 RTC.
-- **int write()** write the current time fields to the DS2405 RTC.
-Writes all fields, be aware that weekDay need to be set too.
+- **int read()** read the current day and time fields from the DS2405 RTC.
+- **int write()** write the current day and time fields to the DS2405 RTC.
+Writes all fields, be aware that weekDay need to be set too. 
 - **uint32_t lastRead()** lastTime in milliseconds when RTC is read.
 
 
 The **lastRead()** value allows e.g. to track the seconds in the MCU using
 millis() and only reread the RTC once every minute. 
-Even longer periods are possible depending on the project.
+Even longer periods before rereading the RTC are possible depending on 
+what the project needs.
 
 
 ### Getters
 
 Getters return the last value read, to update these fields call **read()** first.
 
-Note that any call to **setSeconds()** etc overwrites the internal registers
+Note that any call to **setSeconds()** etc. overwrites the internal variables
 of the library. So use with care. 
 
 - **uint8_t seconds()** returns 0..59.
@@ -212,13 +213,15 @@ The duration of a pulse is ~250 ms according to the datasheet.
 
 See datasheet for details.
 
-Setters, most are similar to the setters of the day/time, except the week.
-This one is a bit mask of all 7 days of the week and multiple can be selected.
+Setters, most are similar to the setters of the day/time, except **setAlarmWeek()**.
+This one uses bit mask of all 7 days of the week and multiple can be selected.
+
 
 - **int setAlarmSecond(uint8_t value)**
 - **int setAlarmMinute(uint8_t value)**
 - **int setAlarmHour(uint8_t value)**
-- **int setAlarmWeek(uint8_t value)**
+- **int setAlarmWeek(uint8_t value)** value == bit mask of weekdays.
+  - bit_mask == { 0 sat fri thu wed tue mon sun } == LSB oriented list.
 - **int setAlarmDay(uint8_t value)**
 - **int setAlarmMonth(uint8_t value)**
 - **int setAlarmYear(uint8_t value)**
@@ -228,7 +231,8 @@ Getters, return the last set value.
 - **int getAlarmSecond()**
 - **int getAlarmMinute()**
 - **int getAlarmHour()**
-- **int getAlarmWeek()**
+- **int getAlarmWeek()** returns a bit mask of weekdays.
+  - bit_mask == { 0 sat fri thu wed tue mon sun } == LSB oriented list.
 - **int getAlarmDay()**
 - **int getAlarmMonth()**
 - **int getAlarmYear()**
@@ -313,7 +317,7 @@ The following functions use index 0..11.
 The user should guard the index especially for the 16 and 32 bit versions as
 the boundaries are not checked.
 
-12 bytes can be used e.g. to hold 3 hms timestamps.
+12 bytes can be used e.g. to hold about 3 timestamps.
 
 - **int SRAMwrite8(uint8_t index, uint8_t value)**
 - **int SRAMwrite16(uint8_t index, uint16_t value)**
@@ -325,7 +329,7 @@ the boundaries are not checked.
 
 ### Low level: readRegister - writeRegister
 
-Allows to access all functionality the library did not implement (yet).
+Allows to access all functionality the library does not implement.
 Check datasheet for details per register.
 Use with care.
 
@@ -352,10 +356,15 @@ Use with care.
 - test SRAM with a SD2405 
 - investigate behaviour internal battery at low temperature ( < 0 C)
 - test platforms
-
+- verify weekday need to be written too (as it can be calculated from others)
 
 #### Could
 
+- optimize read / write
+  - fetch only needed fields e.g. only S or HHMMSS or YYMMDD or ...
+  - would reduce communication time.
+  - int read(register, count = 1);
+  - int write(register, count = 1);
 - add examples
 - cache control registers to improve performance.
   - only after confirmed with hardware.

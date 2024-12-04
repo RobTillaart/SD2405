@@ -14,15 +14,8 @@
 //
 //  CONSTRUCTOR
 //
-SD2405::SD2405(TwoWire *wire)
+SD2405::SD2405(TwoWire *wire) : _wire { wire }
 {
-  _wire     = wire;
-  _address  = 0x32;  //  fixed.
-  _lastRead = 0;
-  for (int i = 0; i < 7; i++)
-  {
-    _reg[i] = 0;
-  }
 }
 
 

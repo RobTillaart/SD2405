@@ -187,15 +187,13 @@ public:
 
 
 protected:
-  uint8_t   _address;
   TwoWire * _wire;
+  uint8_t   _address { 0x32 };
 
-  //  array holding the values
-  uint8_t   _reg[7];
-  uint32_t  _lastRead = 0;
-
-  int       _rv;
-  uint16_t  _type = 3231;
+  //  array holding the values to get / set
+  uint8_t   _reg[7] = {0, 0, 0, 0, 0, 0, 0};
+  uint32_t  _lastRead { 0 };
+  int       _rv { 0 };
 
   uint8_t   dec2bcd(uint8_t value);
   uint8_t   bcd2dec(uint8_t value);
