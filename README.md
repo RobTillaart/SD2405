@@ -35,15 +35,22 @@ elements.
 
 The library supports two generic **readRegister()** and **writeRegister()** functions.
 These two functions allows users access to all registers and to do anything possible.
+In time these might move to the protected section of the library.
 
 The SD2405 has several functions not found on other RTC's, especially a
 correction for the clock to minimize deviations (ppm). 
 Check out **int adjustClockFrequency(int32_t oscillator, int32_t target)** below.
 
-Note: This SD2405 library is a refactored version of an older experimental 
+Another important functionality is the option to enable and disable writing to the RTC.
+be sure to **enableWriteRTC()** before **write()**.
+
+**Note:** This SD2405 library is a refactored version of an older experimental 
 SD2405 library from 2022 which was never published. 
 The API (base RTC functions), documentation and examples is recently (dec 2024) 
 aligned with my DS3232 library.
+
+**Note:** not all functionality is tested yet. 
+This will take several releases as my time is limited.
 
 Feedback as always is welcome, please open an issue on GitHub.
 
@@ -51,8 +58,15 @@ Feedback as always is welcome, please open an issue on GitHub.
 ### AM/PM
 
 The library only supports the 24 hour per day model to minimize footprint.
-Subtracting 12 hours is not difficult if one needs an **AM/PM** layout.
+Subtracting 12 hours is not to difficult if one needs an **AM/PM** layout.
 
+```
+00:00 => 00:00 AM
+11:00 => 11:00 AM
+12:00 => 12:00 PM
+13:00 => 01:00 PM
+23:00 => 11:00 PM
+```
 
 ### Breaking changes 0.2.0
 
@@ -63,7 +77,9 @@ of code fixes in the library. **Pre 0.2.0 versions are obsolete**.
 - read() + write() works as intended.
 - SRAM functions work as intended.
 
-Still to verify, alarms and interrupts.
+Other functions still to verify, think alarms and interrupts.
+
+Feedback as always is welcome, please open an issue on GitHub.
 
 
 ### Compatibles
@@ -377,6 +393,7 @@ Use with care.
   - would reduce communication time.
   - int read(register, count = 1);
 - add examples
+  - AM/PM example.
 - cache control registers to improve performance.
   - only after confirmed with hardware.
 - optimized bcd2dec (from fast math)

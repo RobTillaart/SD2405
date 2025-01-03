@@ -208,6 +208,9 @@ protected:
 };
 
 
+//  DERIVED CLASSES ?
+//  should we have a minimal base class? SD2405_minimal
+
 
 //  -- END OF FILE --
 
