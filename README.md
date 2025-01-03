@@ -16,8 +16,10 @@ Arduino library for I2C SD2405 RTC and compatibles.
 
 ## Description
 
+**Experimental**
+
 This SD2405 library provides a interface to read and write the date
-and time to and from the I2C SD2405 RTC device and compatibles.
+and time to and from the I2C SD2405 RTC device and compatibles (SD2405AL).
 Furthermore one can set alarms in many formats.
 
 An unique feature of the SD2405 is the **internal battery**, which should 
@@ -31,9 +33,6 @@ seconds, minutes etc. and not use ``` time structs``` from libraries like
 Goal is to improve the ease of use for those who just need the date and time 
 elements.
 
-The library only supports the 24 hour per day model to minimize footprint.
-Subtracting 12 hours is not difficult if one needs an **AM/PM** layout.
-
 The library supports two generic **readRegister()** and **writeRegister()** functions.
 These two functions allows users access to all registers and to do anything possible.
 
@@ -43,10 +42,16 @@ Check out **int adjustClockFrequency(int32_t oscillator, int32_t target)** below
 
 Note: This SD2405 library is a refactored version of an older experimental 
 SD2405 library from 2022 which was never published. 
-The API (base RTC functions), documentation and examples is recently (0.1.1) 
+The API (base RTC functions), documentation and examples is recently (dec 2024) 
 aligned with my DS3232 library.
 
 Feedback as always is welcome, please open an issue on GitHub.
+
+
+### AM/PM
+
+The library only supports the 24 hour per day model to minimize footprint.
+Subtracting 12 hours is not difficult if one needs an **AM/PM** layout.
 
 
 ### Breaking changes 0.2.0
@@ -353,38 +358,36 @@ Use with care.
 #### Must
 
 - improve documentation.
-- get hardware to test
+- clean up code
 
 #### Should
 
-(need hardware + time)
-
-- test performance / footprint / I2C clock speed.
-  - fill table
+- test more with hardware (need time)
 - investigate INTerrupts
   - check duration of INT pulses.
-- test SRAM with a SD2405 
+  - add examples
 - investigate behaviour internal battery at low temperature ( < 0 C)
 - test platforms
-- verify weekday need to be written too (as it can be calculated from others)
+
 
 #### Could
 
-- optimize read / write
+- optimize read
   - fetch only needed fields e.g. only S or HHMMSS or YYMMDD or ...
   - would reduce communication time.
   - int read(register, count = 1);
-  - int write(register, count = 1);
 - add examples
 - cache control registers to improve performance.
   - only after confirmed with hardware.
 - optimized bcd2dec (from fast math)
-- register names instead of numbers?
 - add error handling
   - last value rv?
 
 
 #### Wont
+
+- support AM/PM mode 12/24
+- optimize write is not supported (datasheet)
 
 
 ## Support

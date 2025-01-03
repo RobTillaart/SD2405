@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - update examples
 - update readme.md
 
-
 ----
 
 ## [0.1.2] - 2024-12-03

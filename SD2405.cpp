@@ -133,8 +133,8 @@ void SD2405::setYear(uint8_t value)    { _reg[6] = value; }
 //          3 = timer
 //  repeat: single = false,
 //          repeat = true until INTAF is reset
-//  autoReset: 0 = false,
-//             1 = true.
+//  autoReset: ARST = 0 = false,
+//             ARST = 1 = true.
 int SD2405::configureInterrupt(uint8_t source, bool repeat, bool autoReset)
 {
   const uint8_t IM    = 0x40;
@@ -240,6 +240,8 @@ int SD2405::setCountDownMask(uint8_t bit_mask)
 //
 //  par 5.4. register 0x12, 0..127
 //  read the data sheet (twice)
+//  oscillator = actual frequency (ist)
+//  target     = target frequency (soll)
 int SD2405::adjustClockFrequency(int32_t oscillator, int32_t target)
 {
   int amount = 0;
