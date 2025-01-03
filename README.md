@@ -46,9 +46,19 @@ SD2405 library from 2022 which was never published.
 The API (base RTC functions), documentation and examples is recently (0.1.1) 
 aligned with my DS3232 library.
 
-Note: The current library is not tested yet with hardware.
-
 Feedback as always is welcome, please open an issue on GitHub.
+
+
+### Breaking changes 0.2.0
+
+The library is tested with hardware resulting in a 0.2.0 version with a lot
+of code fixes in the library. **Pre 0.2.0 versions are obsolete**.
+
+- disableWriteRTC() + enableWriteRTC() works as intended.
+- read() + write() works as intended.
+- SRAM functions work as intended.
+
+Still to verify, alarms and interrupts.
 
 
 ### Compatibles
@@ -80,22 +90,22 @@ Pull ups are needed on SDA, SCL.
 
 ### Performance
 
-I2C bus speed is not mentioned in the datasheet.
-However it is expected to supports up to 400 KHz.  (feedback welcome).
+Max I2C bus speed in the datasheet is 400 kHz, however 800 kHz still worked. 
+However the gain above the 400 kHz is relative small.
 
-Timing of UNO with SD2405 of **read()** in microseconds.
+Timing of UNO with SD2405 of **read()** in microseconds. Version 0.2.0.
 
 |  board   |  speed   |  time  |  notes  |
 |:--------:|:--------:|:------:|:-------:|
-|   UNO    |   50000  |        |
-|   UNO    |  100000  |        |
-|   UNO    |  200000  |        |
-|   UNO    |  300000  |        |
-|   UNO    |  400000  |        |  max official supported ??
-|   UNO    |  500000  |        |
-|   UNO    |  600000  |        |
-|   UNO    |  700000  |        |
-|   UNO    |  800000  |        |
+|   UNO    |   50000  |  2011  |
+|   UNO    |  100000  |  1078  |
+|   UNO    |  200000  |   606  |
+|   UNO    |  300000  |   445  |
+|   UNO    |  400000  |   377  |  max official supported ??
+|   UNO    |  500000  |   341  |
+|   UNO    |  600000  |   315  |
+|   UNO    |  700000  |   299  |
+|   UNO    |  800000  |   289  |
 
 Note that the performance can be increased a lot by keeping track
 of the **lastRead()**. See example **SD2405_demo_read_minute.ino**
