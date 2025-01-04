@@ -59,7 +59,7 @@ int SD2405::read()
   {
     _reg[i] = bcd2dec(_wire->read());
   }
-  _reg[2] = bcd2dec(_wire->read() & 0x3F);
+  _reg[2] = bcd2dec(_wire->read() & 0x3F);  //  use 24 hour format
   for (int i = 3; i < 7; i++)
   {
     _reg[i] = bcd2dec(_wire->read());
@@ -78,7 +78,7 @@ int SD2405::write()
   {
     _wire->write(dec2bcd(_reg[i]));
   }
-  _wire->write(dec2bcd(_reg[2]) | 0x80);
+  _wire->write(dec2bcd(_reg[2]) | 0x80);  //  use 24 hour format
   for (int i = 3; i < 7; i++)
   {
     _wire->write(dec2bcd(_reg[i]));
